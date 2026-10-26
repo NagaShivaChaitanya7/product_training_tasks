@@ -1,32 +1,59 @@
 import java.util.*;
 
-public class Q06LowestCommonAncestor {
-    static class Node {
-        int value;
-        Node left, right;
-        Node(int value) { this.value = value; }
-    }
+public class ShortestPathBinaryMatrix {
+    public static int shortestPath(int[][] grid) {
+        int n = grid.length;
+        int m = grid[0].length;
 
-    static Node lca(Node root, int firstValue, int secondValue) {
-        if (root == null || root.value == firstValue || root.value == secondValue) return root;
-        Node left = lca(root.left, firstValue, secondValue);
-        Node right = lca(root.right, firstValue, secondValue);
-        if (left != null && right != null) return root;
-        return left != null ? left : right;
-    }
-
-    public static void main(String[] args) {
-        Scanner obj = new Scanner(System.in);
-        int size = obj.nextInt();
-        Node[] nodes = new Node[size];
-        for (int i = 0; i < size; i++) nodes[i] = new Node(obj.nextInt());
-        for (int i = 0; i < size; i++) {
-            int leftIndex = obj.nextInt(), rightIndex = obj.nextInt();
-            if (leftIndex != -1) nodes[i].left = nodes[leftIndex];
-            if (rightIndex != -1) nodes[i].right = nodes[rightIndex];
+        if (grid[0][0] != 0 || grid[n - 1][m - 1] != 0) {
+            return -1;
         }
-        int firstValue = obj.nextInt(), secondValue = obj.nextInt();
-        Node answer = lca(nodes[0], firstValue, secondValue);
-        System.out.println(answer == null ? "Not found" : answer.value);
+
+        int[][] directions = {
+            {-1, -1}, {-1, 0}, {-1, 1},
+            {0, -1},           {0, 1},
+            {1, -1},  {1, 0},  {1, 1}
+        };
+
+        Queue<int[]> queue = new LinkedList<>();
+        boolean[][] visited = new boolean[n][m];
+        queue.offer(new int[]{0, 0, 1});
+        visited[0][0] = true;
+        while (!queue.isEmpty()) {
+            int[] current = queue.poll();
+            int r = current[0];
+            int c = current[1];
+            int distance = current[2];
+            if (r == n - 1 && c == m - 1) {
+                return distance;
+            }
+            for (int[] d : directions) {
+                int nr = r + d[0];
+                int nc = c + d[1];
+                
+                if (nr >= 0 && nr < n && nc >= 0 && nc < m && grid[nr][nc] == 0 && !visited[nr][nc]) {
+                        visited[nr][nc] = true;
+                        queue.offer(new int[]{nr, nc, distance + 1});
+                }
+            }
+        }
+        return -1;
+    }
+    public static void main(String[] args) {
+        System.out.println(shortestPath(new int[][]{
+            {0, 1}, {1, 0}
+        })); 
+        System.out.println(shortestPath(new int[][]{
+            {0, 0, 0}, {1, 1, 0}, {1, 1, 0}
+        })); 
+        System.out.println(shortestPath(new int[][]{
+            {1, 0}, {0, 0}
+        })); 
+        System.out.println(shortestPath(new int[][]{
+            {0}
+        })); 
+        System.out.println(shortestPath(new int[][]{
+            {0, 1}, {1, 1}
+        })); 
     }
 }
